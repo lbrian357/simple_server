@@ -1,4 +1,5 @@
 require 'socket'
+require 'json'
 
 class Browser
   attr_accessor :host, :port, :path, :emails
@@ -27,8 +28,8 @@ class Browser
     name = gets.chomp
     print 'email? '
     email = gets.chomp
-    self.emails[:viking] = {name:name, email:email}
-    p emails
+    self.emails[:viking] = {:name => name, :email => email}
+    emails
   end
 
 
@@ -47,8 +48,9 @@ class Browser
 
   def post_request
     # This is the HTTP request we send to fetch a file
-    request = "POST #{path} HTTP/1.0\r\n"
-    viking_register
+    v_json =viking_register.to_json
+    p v_json
+    request = "POST #{v_json} HTTP/1.0\r\n" + "Date: #{Time.now.ctime}\r\n" + "Content-Type: JSON\r\n" + "Content-Length: #{v_json.bytesize}\r\n"
 
     socket = TCPSocket.open(host,port)  # Connect to server
     socket.print(request)               # Send request
